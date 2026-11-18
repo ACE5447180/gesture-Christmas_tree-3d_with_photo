@@ -1054,18 +1054,20 @@
                 }
                 const cellX = low % HEART_DENSITY_WIDTH;
                 const cellY = Math.floor(low / HEART_DENSITY_WIDTH);
+                const localDensity = heartDensity[low] / 15;
                 const normalizedX =
                     ((cellX + Math.random()) / HEART_DENSITY_WIDTH) * 2 - 1;
                 const normalizedY =
                     1 - ((cellY + Math.random()) / HEART_DENSITY_HEIGHT) * 2;
+                const thickness = 2.35 + localDensity * 1.95;
                 const depth = Math.random() * 2 - 1;
                 const roundedLayer =
-                    0.93 +
-                    0.07 * Math.sqrt(Math.max(0, 1 - depth * depth));
+                    0.95 +
+                    0.05 * Math.sqrt(Math.max(0, 1 - depth * depth));
                 return [
                     normalizedX * roundedLayer * 9.25,
                     2.5 + normalizedY * roundedLayer * 7.8,
-                    depth * 2.2
+                    depth * thickness
                 ];
             }
 
@@ -1076,7 +1078,7 @@
                 color.setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
                 colors.push(color.r, color.g, color.b);
                 const depthGlow = THREE.MathUtils.clamp(
-                    (heartPoint[2] + 2.2) / 4.4,
+                    (heartPoint[2] + 4.3) / 8.6,
                     0.08,
                     1
                 );
@@ -1631,7 +1633,7 @@
             mainGroup.rotation.x = STATE.rotation.x;
             const targetScatterMix = STATE.mode === 'TREE' ? 0 : 1;
             if (targetScatterMix === 1 && scatterMix < 0.01) {
-                STATE.rotation.y = 0.22;
+                STATE.rotation.y = 0.34;
                 STATE.rotation.x = 0.03;
             }
             scatterMix += (targetScatterMix - scatterMix) * Math.min(1, dt * 3.2);
