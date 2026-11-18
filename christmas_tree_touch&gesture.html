@@ -1026,19 +1026,19 @@
 
                 function insideHeart(x, y) {
                     const leftLobe =
-                        Math.pow((x + 0.38) / 0.63, 2) +
-                            Math.pow((y - 0.3) / 0.6, 2) <=
+                        Math.pow((x + 0.54) / 0.64, 2) +
+                            Math.pow((y - 0.32) / 0.62, 2) <=
                         1;
                     const rightLobe =
-                        Math.pow((x - 0.38) / 0.63, 2) +
-                            Math.pow((y - 0.3) / 0.6, 2) <=
+                        Math.pow((x - 0.54) / 0.64, 2) +
+                            Math.pow((y - 0.32) / 0.62, 2) <=
                         1;
-                    const bodyProgress = (y + 1.02) / 1.46;
+                    const bodyProgress = (y + 1.05) / 1.5;
                     const body =
                         bodyProgress >= 0 &&
                         bodyProgress <= 1 &&
                         Math.abs(x) <=
-                            Math.pow(Math.max(0, bodyProgress), 0.78);
+                            Math.pow(Math.max(0, bodyProgress), 0.74);
                     return leftLobe || rightLobe || body;
                 }
 
@@ -1068,10 +1068,13 @@
                     radialScale = 0.82 + Math.random() * 0.16;
                 }
                 const depth = Math.random() * 2 - 1;
+                const roundedLayer =
+                    0.92 +
+                    0.08 * Math.sqrt(Math.max(0, 1 - depth * depth));
                 return [
-                    directionX * low * radialScale * 8.6,
-                    2.7 + directionY * low * radialScale * 8.5,
-                    depth * 1.7
+                    directionX * low * radialScale * roundedLayer * 8.3,
+                    2.7 + directionY * low * radialScale * roundedLayer * 8.3,
+                    depth * 2.2
                 ];
             }
 
@@ -1082,8 +1085,8 @@
                 color.setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
                 colors.push(color.r, color.g, color.b);
                 const depthGlow = THREE.MathUtils.clamp(
-                    (heartPoint[2] + 5.5) / 11,
-                    0.2,
+                    (heartPoint[2] + 2.2) / 4.4,
+                    0.08,
                     1
                 );
                 heartColor.setRGB(
