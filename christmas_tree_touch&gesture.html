@@ -878,7 +878,7 @@
             calculatePositions() {
                 if (this.type === 'PHOTO') {
                     this.posTree.set(0, 0, 0);
-                    const rScatter = 8 + Math.random()*12;
+                    const rScatter = 6.5 + Math.random()*5.5;
                     const theta = Math.random() * Math.PI * 2;
                     const phi = Math.acos(2 * Math.random() - 1);
                     this.posScatter.set(rScatter * Math.sin(phi) * Math.cos(theta), rScatter * Math.sin(phi) * Math.sin(theta), rScatter * Math.cos(phi));
@@ -959,7 +959,7 @@
                 if (this.isDust) {
                     s = this.baseScale * (0.8 + 0.4 * Math.sin(clock.elapsedTime * 4 + this.mesh.id));
                     if (mode === 'TREE') s = 0;
-                } else if (mode === 'SCATTER' && this.type === 'PHOTO') s = this.baseScale * 2.5;
+                } else if (mode === 'SCATTER' && this.type === 'PHOTO') s = this.baseScale * 1.8;
                 else if (mode === 'FOCUS') {
                     if (this.mesh === focusTargetMesh) s = 4.5; else s = this.baseScale * 0.8;
                 }
@@ -976,7 +976,13 @@
             photos.forEach((p, i) => {
                 const y = bottomY + stepY * i + stepY/2;
                 const normalizedH = (y + h/2) / CONFIG.particles.treeHeight;
-                const r = Math.max(1.0, CONFIG.particles.treeRadius * (1.0 - normalizedH)) + 3.0;
+                const r =
+                    Math.max(
+                        0.7,
+                        CONFIG.particles.treeRadius *
+                            (1.0 - normalizedH) *
+                            0.76
+                    ) + 1.2;
                 const angle = normalizedH * Math.PI * 2 * loops + (Math.PI/4);
                 p.posTree.set(Math.cos(angle) * r, y, Math.sin(angle) * r);
             });
@@ -1021,19 +1027,19 @@
                     hx = Math.random() * 2.2 - 1.1;
                     hy = Math.random() * 2.08 - 1.04;
                     const leftLobe =
-                        Math.pow((hx + 0.46) / 0.63, 2) +
-                            Math.pow((hy - 0.34) / 0.59, 2) <=
+                        Math.pow((hx + 0.38) / 0.63, 2) +
+                            Math.pow((hy - 0.30) / 0.60, 2) <=
                         1;
                     const rightLobe =
-                        Math.pow((hx - 0.46) / 0.63, 2) +
-                            Math.pow((hy - 0.34) / 0.59, 2) <=
+                        Math.pow((hx - 0.38) / 0.63, 2) +
+                            Math.pow((hy - 0.30) / 0.60, 2) <=
                         1;
-                    const bodyProgress = (hy + 1.02) / 1.38;
+                    const bodyProgress = (hy + 1.02) / 1.46;
                     const body =
                         bodyProgress >= 0 &&
                         bodyProgress <= 1 &&
                         Math.abs(hx) <=
-                            Math.pow(Math.max(0, bodyProgress), 0.62);
+                            Math.pow(Math.max(0, bodyProgress), 0.78);
                     inside = leftLobe || rightLobe || body;
                 } while (!inside);
 

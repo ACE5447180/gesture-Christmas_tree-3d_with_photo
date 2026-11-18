@@ -32,6 +32,7 @@ https://ace5447180.github.io/gesture-Christmas_tree-3d_with_photo/christmas_tree
 * **专属祝福**：页面顶部完整显示 “Merry Christmas”，并标注 “To：小怡”。
 * **隔空控物**：不需要鼠标，对着摄像头挥挥手就能控制它（感觉像奇异博士）。
 * **挂载回忆**：点右上角的按钮上传照片，它们会变成带浅粉框的拍立得，飘在树周围。
+* **近景照片**：上传照片会贴近树冠和中心爱心排列，不再飘到外围远处。
 * **全屏呈现**：页面固定铺满手机或桌面视口，不产生滚动，并保留微信安全区适配。
 * **背景音乐**：页面包含《All I Want for Christmas Is You》，首次轻触页面或音乐按钮后播放。
 <img width="2557" height="1291" alt="image" src="https://github.com/user-attachments/assets/d7d31b4c-bf4d-49b2-b922-79813bbddba5" />
