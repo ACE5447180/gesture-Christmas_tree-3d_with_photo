@@ -10,7 +10,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pink & Gold Christmas Tree</title>
+    <title>Merry Christmas · 全屏粒子圣诞树</title>
 
     <!-- 引入 FontAwesome 图标库 (让图标更美观) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -21,20 +21,35 @@
             margin: 0;
             overflow: hidden;
             background:
-                radial-gradient(circle at 50% 46%, rgba(108, 34, 78, 0.38) 0%, rgba(39, 12, 32, 0.32) 30%, transparent 58%),
-                radial-gradient(circle at center, #190815 0%, #0b040d 56%, #040207 100%);
-            background-color: #060208;
+                radial-gradient(circle at 50% 46%, rgba(71, 116, 146, 0.13) 0%, rgba(18, 31, 43, 0.12) 34%, transparent 62%),
+                #000;
+            background-color: #000;
             font-family: 'Times New Roman', serif;
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
+            overscroll-behavior: none;
         }
-        #canvas-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; cursor: grab; }
+        html, body {
+            width: 100%;
+            height: 100%;
+            min-height: 100%;
+            overflow: hidden;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            cursor: grab;
+        }
         #canvas-container:active { cursor: grabbing; }
 
         /* UI Overlay */
         #ui-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; inset: 0; width: 100%; height: 100%;
             z-index: 10; pointer-events: none;
             display: flex; flex-direction: column;
             align-items: center;
@@ -48,28 +63,28 @@
         /* Loading */
         #loader {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #08030a; z-index: 100;
+            background: #000; z-index: 100;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.8s ease-out;
         }
         .loader-text {
-            color: #f3b7cf; font-size: 14px; letter-spacing: 4px; margin-top: 20px;
+            color: #d8f2ff; font-size: 14px; letter-spacing: 4px; margin-top: 20px;
             text-transform: uppercase; font-weight: 100;
         }
         .spinner {
-            width: 40px; height: 40px; border: 1px solid rgba(243, 183, 207, 0.18);
-            border-top: 1px solid #f3b7cf; border-radius: 50%;
+            width: 40px; height: 40px; border: 1px solid rgba(182, 230, 255, 0.22);
+            border-top: 1px solid #d8f2ff; border-radius: 50%;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Typography */
         h1 {
-            color: #ffe7ae; font-size: 8vw;
+            color: #f2fbff; font-size: 8vw;
             max-width: 56px; margin: 0; font-weight: 400;
             letter-spacing: 6px;
-            text-shadow: 0 0 50px rgba(255, 164, 202, 0.42);
-            background: linear-gradient(115deg, #fff5df 5%, #ffb8d3 48%, #f0c76d 100%);
+            text-shadow: 0 0 50px rgba(170, 230, 255, 0.34);
+            background: linear-gradient(115deg, #ffffff 5%, #c8f3ff 52%, #ffc8df 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             font-family: 'Cinzel', 'Times New Roman', serif;
             opacity: 0.9; transition: opacity 0.5s ease;
@@ -79,19 +94,19 @@
 
         .countdown-line {
             margin: 12px 0 0;
-            color: rgba(255, 226, 190, 0.7);
+            color: rgba(213, 240, 255, 0.76);
             font-family: 'Cinzel', Georgia, serif;
             font-size: 11px;
             font-variant-numeric: tabular-nums;
             letter-spacing: 2.2px;
             line-height: 1.5;
             text-align: center;
-            text-shadow: 0 0 14px rgba(255, 153, 196, 0.35);
+            text-shadow: 0 0 14px rgba(140, 218, 255, 0.32);
             pointer-events: none;
         }
 
         .countdown-line strong {
-            color: #ffc5dc;
+            color: #e1f7ff;
             font-weight: 400;
         }
 
@@ -115,9 +130,9 @@
         }
 
         .control-btn {
-            background: linear-gradient(135deg, rgba(52, 18, 42, 0.78), rgba(23, 9, 20, 0.7));
-            border: 1px solid rgba(244, 177, 205, 0.42);
-            color: #f8c3d8; padding: 10px 20px;
+            background: linear-gradient(135deg, rgba(14, 27, 38, 0.8), rgba(6, 12, 18, 0.72));
+            border: 1px solid rgba(181, 228, 255, 0.44);
+            color: #d8f2ff; padding: 10px 20px;
             cursor: pointer; text-transform: uppercase;
             letter-spacing: 2px; font-size: 10px;
             transition: all 0.4s;
@@ -126,16 +141,16 @@
         }
 
         .control-btn.active {
-            background: rgba(251, 191, 215, 0.9); color: #270b1c;
-            box-shadow: 0 0 20px rgba(255, 132, 183, 0.5);
+            background: rgba(196, 239, 255, 0.92); color: #071822;
+            box-shadow: 0 0 20px rgba(128, 215, 255, 0.44);
         }
         .control-btn:hover {
-            background: linear-gradient(135deg, #ffd7e7, #efc473); color: #270b1c;
-            box-shadow: 0 0 20px rgba(255, 132, 183, 0.45);
+            background: linear-gradient(135deg, #e4f8ff, #ffc8df); color: #071822;
+            box-shadow: 0 0 20px rgba(128, 215, 255, 0.4);
         }
 
         .hint-text {
-            color: rgba(212, 175, 55, 0.5); font-size: 9px;
+            color: rgba(183, 227, 250, 0.5); font-size: 9px;
             letter-spacing: 1px; text-transform: uppercase;
             text-align: right; margin-top: 5px; max-width: 200px;
         }
@@ -151,15 +166,15 @@
         }
         .mode-btn {
             width: 50px; height: 50px; border-radius: 50%;
-            background: rgba(20, 7, 17, 0.72);
-            border: 1px solid rgba(255, 196, 220, 0.7);
-            color: #ffd4e4; font-size: 20px;
+            background: rgba(6, 14, 20, 0.76);
+            border: 1px solid rgba(184, 231, 255, 0.68);
+            color: #dcf6ff; font-size: 20px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.3s;
             backdrop-filter: blur(8px);
-            box-shadow: 0 0 18px rgba(244, 142, 184, 0.12);
+            box-shadow: 0 0 18px rgba(128, 215, 255, 0.12);
         }
-        .mode-btn:active { transform: scale(0.9); background: linear-gradient(135deg, #ffd7e7, #efc473); color: #270b1c; }
+        .mode-btn:active { transform: scale(0.9); background: linear-gradient(135deg, #e4f8ff, #ffc8df); color: #071822; }
 
         #music-toggle {
             position: fixed;
@@ -171,10 +186,10 @@
             gap: 8px;
             min-height: 40px;
             padding: 0 14px 0 10px;
-            border: 1px solid rgba(255, 194, 218, 0.48);
+            border: 1px solid rgba(181, 228, 255, 0.52);
             border-radius: 999px;
-            background: linear-gradient(135deg, rgba(55, 18, 42, 0.82), rgba(20, 7, 17, 0.72));
-            color: #ffdbe8;
+            background: linear-gradient(135deg, rgba(13, 27, 38, 0.84), rgba(7, 13, 19, 0.76));
+            color: #dcf6ff;
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
             font-size: 11px;
             letter-spacing: 1px;
@@ -182,7 +197,7 @@
             pointer-events: auto;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 0 28px rgba(255, 126, 179, 0.18);
+            box-shadow: 0 0 28px rgba(128, 215, 255, 0.16);
             transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
         }
 
@@ -191,8 +206,8 @@
         }
 
         #music-toggle.is-playing {
-            border-color: rgba(246, 207, 117, 0.72);
-            box-shadow: 0 0 28px rgba(241, 187, 112, 0.24);
+            border-color: rgba(255, 200, 223, 0.72);
+            box-shadow: 0 0 28px rgba(255, 200, 223, 0.22);
         }
 
         #music-toggle .music-note {
@@ -202,11 +217,11 @@
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #ff9fc7, #f0ca78);
-            color: #2c0d21;
+            background: linear-gradient(135deg, #d8f2ff, #ffc8df);
+            color: #071822;
             font-size: 14px;
             line-height: 1;
-            box-shadow: 0 0 16px rgba(255, 154, 199, 0.4);
+            box-shadow: 0 0 16px rgba(135, 218, 255, 0.34);
         }
 
         #music-toggle.is-pending .music-note {
@@ -233,7 +248,7 @@
 
         #debug-info {
             position: absolute; bottom: 5px; left: 5px;
-            color: rgba(249, 194, 215, 0.65); font-size: 10px;
+            color: rgba(204, 239, 255, 0.65); font-size: 10px;
             font-family: monospace; pointer-events: none; z-index: 51;
             width: 100%; text-align: center;
         }
@@ -242,7 +257,7 @@
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.9);
-            border: 1px solid #d4af37;
+            border: 1px solid #b8e7ff;
             padding: 20px; color: #f6bfd4;
             z-index: 200; text-align: center;
             display: none; border-radius: 8px; min-width: 200px;
@@ -272,7 +287,7 @@
             -webkit-backdrop-filter: blur(10px);
             padding: 15px;
             border-radius: 12px;
-            border: 1px solid rgba(244, 177, 205, 0.25);
+            border: 1px solid rgba(181, 228, 255, 0.24);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
             width: 200px; /* 固定宽度，确保整齐 */
             transition: all 0.3s ease;
@@ -306,12 +321,12 @@
 
         .stats-title {
             font-family: 'Cinzel', serif;
-            color: rgba(247, 190, 213, 0.9);
+            color: rgba(213, 242, 255, 0.9);
             font-size: 10px;
             letter-spacing: 2px;
             text-align: center;
             margin-bottom: 5px;
-            border-bottom: 1px solid rgba(244, 177, 205, 0.15);
+            border-bottom: 1px solid rgba(181, 228, 255, 0.16);
             padding-bottom: 5px;
         }
 
@@ -527,21 +542,20 @@
         // --- 核心配置 ---
         const CONFIG = {
             colors: {
-                bg: 0x09030c,
-                fog: 0x09030c,
-                champagneGold: 0xffd966,
-                roseGold: 0xe8ac83,
-                blushPink: 0xff9fc7,
-                vividRose: 0xff4f96,
-                palePink: 0xffd2e3
+                bg: 0x000000,
+                fog: 0x000000,
+                ice: 0xc9f4ff,
+                heartPink: 0xff85c2
             },
             particles: {
-                count: IS_MOBILE ? 1550 : 2200,
-                dustCount: IS_MOBILE ? 700 : 1200,
-                snowCount: IS_MOBILE ? 480 : 760,
+                treePoints: IS_MOBILE ? 32000 : 50000,
+                groundPoints: IS_MOBILE ? 2600 : 4000,
+                starPoints: IS_MOBILE ? 800 : 1200,
+                heartPoints: IS_MOBILE ? 700 : 1000,
+                snowCount: IS_MOBILE ? 10 : 12,
                 treeHeight: IS_COMPACT ? 21.5 : 24,
                 treeRadius: IS_COMPACT ? 7.5 : 8.4,
-                tierCount: 8
+                tierCount: 9
             },
             camera: { z: 50 },
             preload: {
@@ -564,6 +578,10 @@
         let mainGroup;
         let clock = new THREE.Clock();
         let particleSystem = [];
+        let treeCloud;
+        let treeCloudMaterial;
+        let heartSprite;
+        let scatterMix = 0;
         let photoMeshGroup = new THREE.Group();
         let handLandmarker, video;
         let caneTexture;
@@ -597,7 +615,6 @@
             setupLights();
             createTextures();
             createParticles();
-            createDust();
             createSnow();
             loadPredefinedImages();
             setupPostProcessing();
@@ -692,7 +709,8 @@
             scene.background = null;
             scene.fog = new THREE.FogExp2(CONFIG.colors.fog, 0.015);
             camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 2, CONFIG.camera.z);
+            camera.position.set(0, 3.5, CONFIG.camera.z);
+            camera.lookAt(0, 0, 0);
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, IS_MOBILE ? 1.7 : 2));
@@ -700,6 +718,7 @@
             renderer.toneMappingExposure = 1.75;
             container.appendChild(renderer.domElement);
             mainGroup = new THREE.Group();
+            mainGroup.position.y = -1.4;
             scene.add(mainGroup);
         }
 
@@ -709,27 +728,27 @@
         }
 
         function setupLights() {
-            const ambient = new THREE.AmbientLight(0xffedf4, 0.68);
+            const ambient = new THREE.AmbientLight(0xeaf9ff, 0.82);
             scene.add(ambient);
-            const innerLight = new THREE.PointLight(0xff79b4, 2.4, 24);
+            const innerLight = new THREE.PointLight(0xffb7da, 1.6, 24);
             innerLight.position.set(0, 5, 0);
             mainGroup.add(innerLight);
-            const spotGold = new THREE.SpotLight(0xffd27d, 1350);
-            spotGold.position.set(30, 40, 40); spotGold.angle = 0.5; spotGold.penumbra = 0.5;
-            scene.add(spotGold);
-            const spotRose = new THREE.SpotLight(0xff5e9f, 1100);
-            spotRose.position.set(-30, 18, -28);
-            spotRose.angle = 0.62; spotRose.penumbra = 0.7;
-            scene.add(spotRose);
-            const fill = new THREE.DirectionalLight(0xffe6ee, 0.9);
+            const spotIce = new THREE.SpotLight(0xbdeeff, 1100);
+            spotIce.position.set(30, 40, 40); spotIce.angle = 0.5; spotIce.penumbra = 0.5;
+            scene.add(spotIce);
+            const spotPink = new THREE.SpotLight(0xff85c2, 720);
+            spotPink.position.set(-30, 18, -28);
+            spotPink.angle = 0.62; spotPink.penumbra = 0.7;
+            scene.add(spotPink);
+            const fill = new THREE.DirectionalLight(0xf1fbff, 0.8);
             fill.position.set(10, -5, 50);
             scene.add(fill);
         }
 
         function setupPostProcessing() {
             const renderScene = new RenderPass(scene, camera);
-            const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.35, 0.55, 0.72);
-            bloomPass.threshold = 0.52; bloomPass.strength = 0.62; bloomPass.radius = 0.52;
+            const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.4, 0.62, 0.84);
+            bloomPass.threshold = 0.58; bloomPass.strength = 0.58; bloomPass.radius = 0.48;
             composer = new EffectComposer(renderer);
             composer.addPass(renderScene);
             composer.addPass(bloomPass);
@@ -754,19 +773,30 @@
             const geometry = new THREE.BufferGeometry();
             const vertices = []; const velocities = [];
             const canvas = document.createElement('canvas');
-            canvas.width = 32; canvas.height = 32;
+            canvas.width = 64; canvas.height = 64;
             const context = canvas.getContext('2d');
-            context.fillStyle = 'white'; context.beginPath();
-            context.arc(16, 16, 16, 0, Math.PI * 2); context.fill();
+            const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, 'rgba(255,255,255,1)');
+            gradient.addColorStop(0.16, 'rgba(244,252,255,0.96)');
+            gradient.addColorStop(0.44, 'rgba(210,239,255,0.24)');
+            gradient.addColorStop(1, 'rgba(210,239,255,0)');
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, 64, 64);
             const snowTexture = new THREE.CanvasTexture(canvas);
             for (let i = 0; i < CONFIG.particles.snowCount; i++) {
-                vertices.push(THREE.MathUtils.randFloatSpread(100), THREE.MathUtils.randFloatSpread(60), THREE.MathUtils.randFloatSpread(60));
-                velocities.push(Math.random() * 0.2 + 0.1, Math.random() * 0.05);
+                vertices.push(
+                    THREE.MathUtils.randFloatSpread(48),
+                    THREE.MathUtils.randFloatSpread(40),
+                    THREE.MathUtils.randFloat(-6, 20)
+                );
+                velocities.push(1.6 + Math.random() * 1.8, Math.random() * 0.08);
             }
             geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
             geometry.setAttribute('userData', new THREE.Float32BufferAttribute(velocities, 2));
             const material = new THREE.PointsMaterial({
-                color: 0xffd4e4, size: 0.44, map: snowTexture, transparent: true, opacity: 0.76, blending: THREE.AdditiveBlending, depthWrite: false
+                color: 0xffffff, size: 2.2, map: snowTexture, transparent: true,
+                opacity: 0.86, blending: THREE.AdditiveBlending, depthWrite: false,
+                sizeAttenuation: true, fog: false
             });
             snowSystem = new THREE.Points(geometry, material);
             scene.add(snowSystem);
@@ -787,10 +817,10 @@
                 positions[i * 3 + 1] -= fallSpeed;
                 const swaySpeed = userData[i * 2 + 1];
                 positions[i * 3] += Math.sin(clock.elapsedTime * 2 + i) * swaySpeed * 0.1;
-                if (positions[i * 3 + 1] < -30) {
-                    positions[i * 3 + 1] = 30;
-                    positions[i * 3] = THREE.MathUtils.randFloatSpread(100);
-                    positions[i * 3 + 2] = THREE.MathUtils.randFloatSpread(60);
+                if (positions[i * 3 + 1] < -20) {
+                    positions[i * 3 + 1] = 20;
+                    positions[i * 3] = THREE.MathUtils.randFloatSpread(48);
+                    positions[i * 3 + 2] = THREE.MathUtils.randFloat(-6, 20);
                 }
             }
             snowSystem.geometry.attributes.position.needsUpdate = true;
@@ -923,161 +953,307 @@
 //   - @Style: Luxury Dashboard UI (Hidden by default, toggle with 'S')
 // -->
         function createParticles() {
-            const sphereGeo = new THREE.SphereGeometry(0.5, 12, 12);
-            const facetGeo = new THREE.OctahedronGeometry(0.52, 0);
-            const softGeo = new THREE.IcosahedronGeometry(0.46, 0);
-            const pinkMat = new THREE.MeshStandardMaterial({
-                color: CONFIG.colors.vividRose,
-                metalness: 0.28,
-                roughness: 0.24,
-                emissive: 0x8d154d,
-                emissiveIntensity: 0.45,
-                transparent: true,
-                opacity: 0.92
-            });
-            const blushMat = new THREE.MeshStandardMaterial({
-                color: CONFIG.colors.blushPink,
-                metalness: 0.34,
-                roughness: 0.2,
-                emissive: 0x8e315d,
-                emissiveIntensity: 0.32,
-                transparent: true,
-                opacity: 0.9
-            });
-            const roseGoldMat = new THREE.MeshStandardMaterial({
-                color: CONFIG.colors.roseGold,
-                metalness: 0.92,
-                roughness: 0.14,
-                envMapIntensity: 1.7,
-                emissive: 0x512416,
-                emissiveIntensity: 0.45,
-                transparent: true,
-                opacity: 0.94
-            });
-            const goldMat = new THREE.MeshStandardMaterial({
-                color: CONFIG.colors.champagneGold,
-                metalness: 1.0,
-                roughness: 0.08,
-                envMapIntensity: 2.1,
-                emissive: 0x4a3309,
-                emissiveIntensity: 0.55,
-                transparent: true,
-                opacity: 0.95
-            });
-            const paleGoldMat = new THREE.MeshStandardMaterial({
-                color: 0xffefc4,
-                metalness: 0.64,
-                roughness: 0.16,
-                emissive: 0x6b4718,
-                emissiveIntensity: 0.38,
-                transparent: true,
-                opacity: 0.88
-            });
-            const materials = [pinkMat, blushMat, roseGoldMat, goldMat, paleGoldMat];
-            const geometries = [sphereGeo, facetGeo, softGeo];
-            for (let i = 0; i < CONFIG.particles.count; i++) {
-                const rand = Math.random();
-                const materialIndex =
-                    rand < 0.27 ? 0 :
-                    rand < 0.52 ? 1 :
-                    rand < 0.73 ? 2 :
-                    rand < 0.93 ? 3 : 4;
-                const geometryIndex =
-                    rand < 0.6 ? 0 :
-                    rand < 0.84 ? 1 : 2;
-                const mesh = new THREE.Mesh(
-                    geometries[geometryIndex],
-                    materials[materialIndex]
+            const spriteCanvas = document.createElement("canvas");
+            spriteCanvas.width = 64;
+            spriteCanvas.height = 64;
+            const spriteContext = spriteCanvas.getContext("2d");
+            const spriteGlow = spriteContext.createRadialGradient(32, 32, 0, 32, 32, 32);
+            spriteGlow.addColorStop(0, "rgba(255,255,255,1)");
+            spriteGlow.addColorStop(0.18, "rgba(255,255,255,0.94)");
+            spriteGlow.addColorStop(0.52, "rgba(255,255,255,0.16)");
+            spriteGlow.addColorStop(1, "rgba(255,255,255,0)");
+            spriteContext.fillStyle = spriteGlow;
+            spriteContext.fillRect(0, 0, 64, 64);
+            const particleTexture = new THREE.CanvasTexture(spriteCanvas);
+
+            const positions = [];
+            const scatterPositions = [];
+            const colors = [];
+            const sizes = [];
+            const color = new THREE.Color();
+            const mapScale = 1.58;
+            const treeHeight = 12;
+            const sourceCenterY = 6.1;
+
+            function addPoint(x, y, z, r, g, b, size) {
+                positions.push(x * mapScale, (y - sourceCenterY) * 2, z * mapScale);
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                const radius = 11 + Math.random() * 15;
+                scatterPositions.push(
+                    radius * Math.sin(phi) * Math.cos(theta),
+                    radius * Math.cos(phi) * 0.85 + 2,
+                    radius * Math.sin(phi) * Math.sin(theta)
                 );
-                const type =
-                    materialIndex < 2 ? 'PINK' :
-                    materialIndex === 4 ? 'PALE_GOLD' : 'GOLD';
-                const s = Math.random() < 0.86
-                    ? 0.24 + Math.random() * 0.32
-                    : 0.5 + Math.random() * 0.34;
-                mesh.scale.set(s,s,s); mesh.rotation.set(Math.random()*6, Math.random()*6, Math.random()*6);
-                mainGroup.add(mesh);
-                particleSystem.push(new Particle(mesh, type, false));
+                color.setRGB(r / 255, g / 255, b / 255, THREE.SRGBColorSpace);
+                colors.push(color.r, color.g, color.b);
+                sizes.push(size);
             }
-            const starCanvas = document.createElement("canvas");
-            starCanvas.width = 256;
-            starCanvas.height = 256;
-            const starContext = starCanvas.getContext("2d");
-            const starGlow = starContext.createRadialGradient(128, 128, 0, 128, 128, 126);
-            starGlow.addColorStop(0, "rgba(255, 249, 224, 0.96)");
-            starGlow.addColorStop(0.22, "rgba(255, 204, 224, 0.58)");
-            starGlow.addColorStop(0.58, "rgba(255, 104, 173, 0.14)");
-            starGlow.addColorStop(1, "rgba(255, 78, 154, 0)");
-            starContext.fillStyle = starGlow;
-            starContext.fillRect(0, 0, 256, 256);
-            starContext.save();
-            starContext.translate(128, 128);
-            starContext.beginPath();
-            for (let i = 0; i < 10; i++) {
-                const angle = -Math.PI / 2 + i * Math.PI / 5;
-                const radius = i % 2 === 0 ? 68 : 29;
+
+            const spiralCount = Math.floor(CONFIG.particles.treePoints * 0.7);
+            for (let i = 0; i < spiralCount; i += 1) {
+                const u = Math.random();
+                const h = Math.pow(u, 1.6);
+                const y = treeHeight * h + 0.2;
+                const branchWave = Math.max(
+                    0,
+                    Math.sin((h * 5.8 + 0.15) * Math.PI * 2)
+                );
+                let baseRadius = Math.pow(1 - h, 1.1) * 3.2;
+                baseRadius *= 1 + 0.65 * branchWave;
+                const angle = u * 9 * Math.PI * 2 + (Math.random() - 0.5) * 0.44;
+                const radius = baseRadius * (0.85 + Math.random() * 0.23);
                 const x = Math.cos(angle) * radius;
-                const y = Math.sin(angle) * radius;
-                if (i === 0) starContext.moveTo(x, y);
-                else starContext.lineTo(x, y);
+                const z = Math.sin(angle) * radius;
+                const midBoost = Math.max(0.15, 1 - Math.abs(h - 0.55) * 1.5);
+                let green = 155 + Math.floor(90 * midBoost) + Math.floor(Math.random() * 36 - 15);
+                let blue = 185 + Math.floor(70 * midBoost) + Math.floor(Math.random() * 51 - 15);
+                if (Math.random() < 0.08) {
+                    green = 255 - Math.floor(Math.random() * 36);
+                    blue = 230 + Math.floor(Math.random() * 26);
+                }
+                addPoint(
+                    x,
+                    y,
+                    z,
+                    255,
+                    Math.min(255, Math.max(0, green)),
+                    Math.min(255, blue),
+                    0.5 + Math.random() * 0.44
+                );
             }
-            starContext.closePath();
-            const starFill = starContext.createLinearGradient(0, -68, 0, 68);
-            starFill.addColorStop(0, "#fffbea");
-            starFill.addColorStop(0.46, "#ffe2a2");
-            starFill.addColorStop(0.78, "#ff9fc5");
-            starFill.addColorStop(1, "#f2c66e");
-            starContext.fillStyle = starFill;
-            starContext.shadowColor = "rgba(255, 151, 198, 0.9)";
-            starContext.shadowBlur = 28;
-            starContext.fill();
-            starContext.shadowBlur = 0;
-            starContext.strokeStyle = "rgba(255, 252, 229, 0.9)";
-            starContext.lineWidth = 2;
-            starContext.stroke();
-            starContext.restore();
-            const starTexture = new THREE.CanvasTexture(starCanvas);
-            const star = new THREE.Sprite(
+
+            for (let i = spiralCount; i < CONFIG.particles.treePoints; i += 1) {
+                const h = Math.pow(Math.random(), 1.9);
+                const y = treeHeight * h + 0.2 + (Math.random() - 0.5) * 0.16;
+                const branchWave = Math.max(
+                    0,
+                    Math.sin((h * 5.8 + 0.15) * Math.PI * 2)
+                );
+                let baseRadius = Math.pow(1 - h, 1.1) * 4.3;
+                baseRadius *= 1 + 0.65 * branchWave;
+                const radius = baseRadius * Math.sqrt(Math.random());
+                const angle = Math.random() * Math.PI * 2;
+                addPoint(
+                    Math.cos(angle) * radius + (Math.random() - 0.5) * 0.16,
+                    y,
+                    Math.sin(angle) * radius + (Math.random() - 0.5) * 0.16,
+                    255,
+                    165 + Math.floor(Math.random() * 61),
+                    190 + Math.floor(Math.random() * 61),
+                    0.42 + Math.random() * 0.38
+                );
+            }
+
+            const treeGeometry = new THREE.BufferGeometry();
+            treeGeometry.setAttribute(
+                "position",
+                new THREE.Float32BufferAttribute(positions, 3)
+            );
+            treeGeometry.setAttribute(
+                "scatterPosition",
+                new THREE.Float32BufferAttribute(scatterPositions, 3)
+            );
+            treeGeometry.setAttribute(
+                "color",
+                new THREE.Float32BufferAttribute(colors, 3)
+            );
+            treeGeometry.setAttribute(
+                "aSize",
+                new THREE.Float32BufferAttribute(sizes, 1)
+            );
+
+            treeCloudMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    uMap: { value: particleTexture },
+                    uMix: { value: 0 },
+                    uPixelRatio: {
+                        value: Math.min(window.devicePixelRatio || 1, IS_MOBILE ? 1.7 : 2)
+                    },
+                    uTime: { value: 0 }
+                },
+                vertexShader: `
+                    attribute vec3 scatterPosition;
+                    attribute vec3 color;
+                    attribute float aSize;
+                    uniform float uMix;
+                    uniform float uPixelRatio;
+                    uniform float uTime;
+                    varying vec3 vColor;
+                    void main() {
+                        vec3 transformed = mix(position, scatterPosition, uMix);
+                        vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.0);
+                        float twinkle = 0.9 + 0.1 * sin(uTime * 2.4 + position.y * 0.8 + position.x);
+                        gl_PointSize = aSize * twinkle * uPixelRatio * (245.0 / max(1.0, -mvPosition.z));
+                        gl_Position = projectionMatrix * mvPosition;
+                        vColor = color;
+                    }
+                `,
+                fragmentShader: `
+                    uniform sampler2D uMap;
+                    varying vec3 vColor;
+                    void main() {
+                        float alpha = texture2D(uMap, gl_PointCoord).a;
+                        if (alpha < 0.02) discard;
+                        gl_FragColor = vec4(vColor, alpha * 0.72);
+                        #include <tonemapping_fragment>
+                        #include <colorspace_fragment>
+                    }
+                `,
+                transparent: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+            treeCloud = new THREE.Points(treeGeometry, treeCloudMaterial);
+            treeCloud.frustumCulled = false;
+            mainGroup.add(treeCloud);
+
+            const heartCanvas = document.createElement("canvas");
+            heartCanvas.width = 256;
+            heartCanvas.height = 256;
+            const heartContext = heartCanvas.getContext("2d");
+            const heartHalo = heartContext.createRadialGradient(128, 128, 0, 128, 128, 124);
+            heartHalo.addColorStop(0, "rgba(255, 195, 224, 0.12)");
+            heartHalo.addColorStop(0.48, "rgba(255, 111, 184, 0.035)");
+            heartHalo.addColorStop(1, "rgba(255, 111, 184, 0)");
+            heartContext.fillStyle = heartHalo;
+            heartContext.fillRect(0, 0, 256, 256);
+            heartContext.save();
+            heartContext.beginPath();
+            heartContext.moveTo(128, 204);
+            heartContext.bezierCurveTo(39, 132, 37, 65, 80, 49);
+            heartContext.bezierCurveTo(112, 38, 125, 65, 128, 82);
+            heartContext.bezierCurveTo(131, 65, 144, 38, 176, 49);
+            heartContext.bezierCurveTo(219, 65, 217, 132, 128, 204);
+            heartContext.closePath();
+            heartContext.fillStyle = "rgba(255, 112, 184, 0.3)";
+            heartContext.strokeStyle = "rgba(255, 175, 215, 0.88)";
+            heartContext.lineWidth = 3;
+            heartContext.shadowColor = "rgba(255, 105, 180, 0.78)";
+            heartContext.shadowBlur = 24;
+            heartContext.fill();
+            heartContext.stroke();
+            heartContext.restore();
+
+            let heartDrawn = 0;
+            while (heartDrawn < CONFIG.particles.heartPoints) {
+                const hx = Math.random() * 2.6 - 1.3;
+                const hy = Math.random() * 2.8 - 1.4;
+                const implicit =
+                    Math.pow(hx * hx + hy * hy - 1, 3) -
+                    hx * hx * Math.pow(hy, 3);
+                if (implicit > 0) continue;
+                const distance = Math.hypot(hx, hy);
+                const factor = Math.max(0.35, 1.15 - 0.5 * distance);
+                const alpha = 0.48 + factor * 0.5;
+                const px = 128 + hx * 58;
+                const py = 142 - hy * 58;
+                heartContext.globalAlpha = alpha;
+                heartContext.fillStyle = factor > 0.82 ? "#fff8fc" : "#ff8fc7";
+                heartContext.beginPath();
+                heartContext.arc(px, py, 0.8 + factor * 1.7, 0, Math.PI * 2);
+                heartContext.fill();
+                heartDrawn += 1;
+            }
+            heartContext.globalAlpha = 1;
+            const heartTexture = new THREE.CanvasTexture(heartCanvas);
+            heartSprite = new THREE.Sprite(
                 new THREE.SpriteMaterial({
-                    map: starTexture,
+                    map: heartTexture,
                     transparent: true,
-                    blending: THREE.AdditiveBlending,
-                    depthWrite: false
+                    blending: THREE.NormalBlending,
+                    depthWrite: false,
+                    toneMapped: false
                 })
             );
-            star.position.set(0, CONFIG.particles.treeHeight / 2 + 1.65, 0);
-            star.scale.set(7.2, 7.2, 1);
-            mainGroup.add(star);
-            mainGroup.add(photoMeshGroup);
-        }
+            heartSprite.position.set(0, 11.6, 0);
+            heartSprite.scale.set(6.8, 6.8, 1);
+            mainGroup.add(heartSprite);
 
-        function createDust() {
-            const geo = new THREE.TetrahedronGeometry(0.08, 0);
-            const pinkGlow = new THREE.MeshBasicMaterial({
-                color: 0xff75b0,
-                transparent: true,
-                opacity: 0.72,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false
-            });
-            const goldGlow = new THREE.MeshBasicMaterial({
-                color: 0xffdf9b,
-                transparent: true,
-                opacity: 0.68,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false
-            });
-            for(let i=0; i<CONFIG.particles.dustCount; i++) {
-                 const mesh = new THREE.Mesh(geo, Math.random() > 0.46 ? pinkGlow : goldGlow);
-                 mesh.scale.setScalar(0.5 + Math.random());
-                 mainGroup.add(mesh);
-                 particleSystem.push(new Particle(mesh, 'DUST', true));
+            const groundPositions = [];
+            const groundColors = [];
+            const rings = [4.6, 6.0, 7.4, 8.8, 10.2, 11.4];
+            for (let i = 0; i < CONFIG.particles.groundPoints; i += 1) {
+                const ring = rings[Math.floor(Math.random() * rings.length)];
+                const radius = Math.max(0, ring + (Math.random() - 0.5) * 0.7);
+                const angle = Math.random() * Math.PI * 2;
+                groundPositions.push(
+                    Math.cos(angle) * radius * mapScale,
+                    (-0.25 - sourceCenterY) * 2,
+                    Math.sin(angle) * radius * mapScale
+                );
+                const channel = Math.random() < 0.15
+                    ? 235 + Math.floor(Math.random() * 21)
+                    : 190 + Math.floor(Math.random() * 46);
+                color.setRGB(channel / 255, channel / 255, 1, THREE.SRGBColorSpace);
+                groundColors.push(color.r, color.g, color.b);
             }
+            const groundGeometry = new THREE.BufferGeometry();
+            groundGeometry.setAttribute(
+                "position",
+                new THREE.Float32BufferAttribute(groundPositions, 3)
+            );
+            groundGeometry.setAttribute(
+                "color",
+                new THREE.Float32BufferAttribute(groundColors, 3)
+            );
+            const groundMaterial = new THREE.PointsMaterial({
+                size: 0.16,
+                map: particleTexture,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.76,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+                sizeAttenuation: true,
+                toneMapped: false,
+                fog: false
+            });
+            mainGroup.add(new THREE.Points(groundGeometry, groundMaterial));
+
+            const starPositions = [];
+            const starColors = [];
+            for (let i = 0; i < CONFIG.particles.starPoints; i += 1) {
+                const x = Math.random() * 36 - 18;
+                const y = 3 + Math.random() * 15;
+                const z = Math.random() * 36 - 18;
+                starPositions.push(
+                    x * mapScale,
+                    (y - sourceCenterY) * 2,
+                    z * mapScale
+                );
+                const base = (215 + Math.floor(Math.random() * 41)) / 255;
+                color.setRGB(base, base, 1, THREE.SRGBColorSpace);
+                starColors.push(color.r, color.g, color.b);
+            }
+            const starGeometry = new THREE.BufferGeometry();
+            starGeometry.setAttribute(
+                "position",
+                new THREE.Float32BufferAttribute(starPositions, 3)
+            );
+            starGeometry.setAttribute(
+                "color",
+                new THREE.Float32BufferAttribute(starColors, 3)
+            );
+            const starMaterial = new THREE.PointsMaterial({
+                size: 0.22,
+                map: particleTexture,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.62,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+                sizeAttenuation: true,
+                toneMapped: false,
+                fog: false
+            });
+            mainGroup.add(new THREE.Points(starGeometry, starMaterial));
+            mainGroup.add(photoMeshGroup);
         }
 
         function addPhotoToScene(texture) {
             const frameGeo = new THREE.BoxGeometry(1.4, 1.4, 0.05);
-            const frameMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.champagneGold, metalness: 1.0, roughness: 0.1 });
+            const frameMat = new THREE.MeshStandardMaterial({ color: 0xffcfe5, metalness: 0.65, roughness: 0.22 });
             const frame = new THREE.Mesh(frameGeo, frameMat);
             let width = 1.2; let height = 1.2;
             if (texture.image) {
@@ -1346,6 +1522,17 @@
             }
             mainGroup.rotation.y = STATE.rotation.y;
             mainGroup.rotation.x = STATE.rotation.x;
+            const targetScatterMix = STATE.mode === 'TREE' ? 0 : 1;
+            scatterMix += (targetScatterMix - scatterMix) * Math.min(1, dt * 3.2);
+            if (treeCloudMaterial) {
+                treeCloudMaterial.uniforms.uMix.value = scatterMix;
+                treeCloudMaterial.uniforms.uTime.value = clock.elapsedTime;
+            }
+            if (heartSprite) {
+                const heartScale = 6.8 * (1 + scatterMix * 0.45);
+                heartSprite.scale.set(heartScale, heartScale, 1);
+                heartSprite.material.opacity = 1 - scatterMix;
+            }
             particleSystem.forEach(p => p.update(dt, STATE.mode, STATE.focusTarget));
             updateSnow();
             composer.render();
