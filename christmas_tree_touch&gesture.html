@@ -10,6 +10,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Permissions-Policy" content="camera=(self)">
     <title>Merry Christmas · 全屏粒子圣诞树</title>
 
     <!-- 引入 FontAwesome 图标库 (让图标更美观) -->
@@ -163,6 +164,8 @@
             transition: all 0.4s;
             display: flex; align-items: center; justify-content: center;
             backdrop-filter: blur(5px); min-width: 120px;
+            appearance: none;
+            -webkit-appearance: none;
         }
 
         .control-btn.active {
@@ -505,7 +508,7 @@
 
         <div class="controls-wrapper">
             <div class="btn-group">
-                <div class="control-btn" id="cam-btn">📷 Enable Gesture</div>
+                <button class="control-btn" id="cam-btn" type="button">📷 Enable Gesture</button>
                 <label class="control-btn">
                     Select Folder
                     <input type="file" id="folder-input" webkitdirectory directory multiple>
@@ -559,9 +562,9 @@
     </div>
 
     <div id="webcam-wrapper">
-        <video id="webcam" autoplay playsinline webkit-playsinline></video>
+        <video id="webcam" autoplay muted playsinline webkit-playsinline></video>
     </div>
-    <div id="debug-info">Drag to rotate • Tap photo to view</div>
+    <div id="debug-info" aria-live="polite">Drag to rotate • Tap photo to view</div>
 
     <script type="module">
         import * as THREE from 'three';
@@ -569,7 +572,6 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-        import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
         import {
             HEART_DENSITY_WIDTH,
             HEART_DENSITY_HEIGHT,
@@ -624,7 +626,11 @@
         let groundCloud;
         let scatterMix = 0;
         let photoMeshGroup = new THREE.Group();
-        let handLandmarker, video;
+        let handLandmarker, video, mediaPipeModule;
+        let activeCameraStream = null;
+        let cameraStartPromise = null;
+        let modelLoadPromise = null;
+        let isPredictionRunning = false;
         let caneTexture;
         let snowSystem;
         let raycaster = new THREE.Raycaster();
@@ -1519,34 +1525,219 @@
             }, { once: true, capture: true });
         }
 
-        async function initMediaPipe() {
-            if (isCameraRunning) return;
-            camBtn.innerText = "Initializing...";
-            debugInfo.innerText = "Loading AI models...";
-            video = document.getElementById('webcam');
-            try {
-                const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
-                handLandmarker = await HandLandmarker.createFromOptions(vision, {
-                    baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`, delegate: "GPU" },
-                    runningMode: "VIDEO", numHands: 1
-                });
-                const constraints = { video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } } };
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = stream;
-                video.addEventListener("loadeddata", predictWebcam);
-                document.getElementById('webcam-wrapper').style.opacity = 1;
-                debugInfo.innerText = "Gesture Active: Show Hand";
-                camBtn.innerText = "Gesture Active";
-                camBtn.classList.add('active');
-                isCameraRunning = true;
-            } catch(e) {
-                console.warn("Camera error:", e);
-                let msg = "Camera Error: " + e.name;
-                if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') msg = "Please allow camera access!";
-                else if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') msg = "HTTPS required for camera!";
-                debugInfo.innerText = msg; showMsg(msg);
-                camBtn.innerText = "Retry Camera";
+        function withTimeout(promise, milliseconds, message) {
+            let timer;
+            return Promise.race([
+                promise,
+                new Promise((_, reject) => {
+                    timer = setTimeout(
+                        () => reject(new Error(message)),
+                        milliseconds
+                    );
+                })
+            ]).finally(() => clearTimeout(timer));
+        }
+
+        function getUserMediaCompat(constraints) {
+            if (
+                navigator.mediaDevices &&
+                typeof navigator.mediaDevices.getUserMedia === "function"
+            ) {
+                return navigator.mediaDevices.getUserMedia(constraints);
             }
+            const legacyGetUserMedia =
+                navigator.getUserMedia ||
+                navigator.webkitGetUserMedia ||
+                navigator.mozGetUserMedia;
+            if (!legacyGetUserMedia) {
+                return Promise.reject(
+                    new Error("当前浏览器不支持摄像头接口")
+                );
+            }
+            return new Promise((resolve, reject) => {
+                legacyGetUserMedia.call(
+                    navigator,
+                    constraints,
+                    resolve,
+                    reject
+                );
+            });
+        }
+
+        function cameraErrorMessage(error) {
+            if (
+                !window.isSecureContext &&
+                location.hostname !== "localhost" &&
+                location.hostname !== "127.0.0.1"
+            ) {
+                return "摄像头只能在 HTTPS 页面中启用";
+            }
+            switch (error && error.name) {
+                case "NotAllowedError":
+                case "PermissionDeniedError":
+                    return "摄像头权限被拒绝，请在微信设置中允许摄像头后重试";
+                case "NotFoundError":
+                case "DevicesNotFoundError":
+                    return "未检测到可用摄像头";
+                case "NotReadableError":
+                case "TrackStartError":
+                    return "摄像头被其他应用占用，请关闭后重试";
+                case "OverconstrainedError":
+                    return "当前摄像头不支持所需分辨率";
+                case "SecurityError":
+                    return "当前页面安全策略禁止访问摄像头";
+                default:
+                    return (
+                        (error && error.message) ||
+                        "摄像头启用失败，请重试"
+                    );
+            }
+        }
+
+        async function ensureGestureModel() {
+            if (handLandmarker) {
+                startPredictionLoop();
+                return;
+            }
+            if (modelLoadPromise) return modelLoadPromise;
+
+            modelLoadPromise = (async () => {
+                debugInfo.innerText = "摄像头已开启 · 正在加载手势识别";
+                camBtn.innerText = "Loading Gesture...";
+                try {
+                    if (!mediaPipeModule) {
+                        mediaPipeModule = await withTimeout(
+                            import("@mediapipe/tasks-vision"),
+                            18000,
+                            "手势识别组件加载超时"
+                        );
+                    }
+                    const { FilesetResolver, HandLandmarker } =
+                        mediaPipeModule;
+                    const vision = await withTimeout(
+                        FilesetResolver.forVisionTasks(
+                            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+                        ),
+                        18000,
+                        "手势识别运行环境加载超时"
+                    );
+                    const options = {
+                        baseOptions: {
+                            modelAssetPath:
+                                "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+                            delegate: "GPU"
+                        },
+                        runningMode: "VIDEO",
+                        numHands: 1
+                    };
+                    try {
+                        handLandmarker = await withTimeout(
+                            HandLandmarker.createFromOptions(vision, options),
+                            18000,
+                            "手势识别模型加载超时"
+                        );
+                    } catch (gpuError) {
+                        console.warn(
+                            "GPU gesture model failed, retrying with CPU.",
+                            gpuError
+                        );
+                        options.baseOptions.delegate = "CPU";
+                        handLandmarker = await withTimeout(
+                            HandLandmarker.createFromOptions(vision, options),
+                            22000,
+                            "手势识别模型加载超时"
+                        );
+                    }
+                    camBtn.innerText = "Gesture Active";
+                    camBtn.classList.add("active");
+                    debugInfo.innerText =
+                        "摄像头与手势识别已开启 · 张开手掌试试";
+                    startPredictionLoop();
+                } catch (modelError) {
+                    console.warn("Gesture model error:", modelError);
+                    camBtn.innerText = "Camera On";
+                    camBtn.classList.add("active");
+                    debugInfo.innerText =
+                        "摄像头已开启 · 手势模型暂不可用，可继续触控";
+                    showMsg(
+                        "摄像头已开启。手势模型加载失败，但触控功能仍可正常使用。"
+                    );
+                } finally {
+                    modelLoadPromise = null;
+                }
+            })();
+            return modelLoadPromise;
+        }
+
+        async function initMediaPipe() {
+            if (cameraStartPromise) return cameraStartPromise;
+            if (isCameraRunning) {
+                if (!handLandmarker) ensureGestureModel();
+                return;
+            }
+
+            cameraStartPromise = (async () => {
+                camBtn.innerText = "Requesting Camera...";
+                camBtn.classList.remove("active");
+                debugInfo.innerText =
+                    "正在请求摄像头权限，请在弹窗中选择允许";
+                video = document.getElementById("webcam");
+
+                try {
+                    if (activeCameraStream) {
+                        activeCameraStream
+                            .getTracks()
+                            .forEach(track => track.stop());
+                    }
+                    activeCameraStream = await getUserMediaCompat({
+                        audio: false,
+                        video: {
+                            facingMode: { ideal: "user" },
+                            width: { ideal: 640 },
+                            height: { ideal: 480 }
+                        }
+                    });
+                    video.muted = true;
+                    video.autoplay = true;
+                    video.playsInline = true;
+                    video.setAttribute("playsinline", "");
+                    video.setAttribute("webkit-playsinline", "");
+                    video.srcObject = activeCameraStream;
+                    document
+                        .getElementById("webcam-wrapper")
+                        .classList.remove("ui-hidden");
+                    document.getElementById("webcam-wrapper").style.opacity = 1;
+                    isCameraRunning = true;
+                    camBtn.innerText = "Camera On";
+                    camBtn.classList.add("active");
+                    debugInfo.innerText =
+                        "摄像头已开启 · 正在加载手势识别";
+                    showMsg("摄像头已开启");
+
+                    try {
+                        await video.play();
+                    } catch (playError) {
+                        console.warn("Video autoplay warning:", playError);
+                        video.addEventListener(
+                            "loadedmetadata",
+                            () => video.play().catch(() => {}),
+                            { once: true }
+                        );
+                    }
+                    ensureGestureModel();
+                } catch (error) {
+                    console.warn("Camera error:", error);
+                    isCameraRunning = false;
+                    camBtn.innerText = "Retry Camera";
+                    camBtn.classList.remove("active");
+                    const message = cameraErrorMessage(error);
+                    debugInfo.innerText = message;
+                    showMsg(message);
+                } finally {
+                    cameraStartPromise = null;
+                }
+            })();
+            return cameraStartPromise;
         }
 // <!--
 //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture & Stats)
@@ -1556,15 +1747,27 @@
 //   - @Style: Luxury Dashboard UI (Hidden by default, toggle with 'S')
 // -->
         let lastVideoTime = -1;
-        async function predictWebcam() {
-            if (video.currentTime !== lastVideoTime) {
-                lastVideoTime = video.currentTime;
-                if (handLandmarker) {
-                    const result = handLandmarker.detectForVideo(video, performance.now());
-                    processGestures(result);
+        function startPredictionLoop() {
+            if (isPredictionRunning || !handLandmarker || !video) return;
+            isPredictionRunning = true;
+            lastVideoTime = -1;
+            const predict = async () => {
+                if (!isPredictionRunning || !isCameraRunning) return;
+                if (video.readyState >= 2 && video.currentTime !== lastVideoTime) {
+                    lastVideoTime = video.currentTime;
+                    try {
+                        const result = handLandmarker.detectForVideo(
+                            video,
+                            performance.now()
+                        );
+                        processGestures(result);
+                    } catch (error) {
+                        console.warn("Gesture detection warning:", error);
+                    }
                 }
-            }
-            requestAnimationFrame(predictWebcam);
+                requestAnimationFrame(predict);
+            };
+            requestAnimationFrame(predict);
         }
 
         function processGestures(result) {
@@ -1603,7 +1806,11 @@
             });
             document.getElementById('file-input').addEventListener('change', handleImageUpload);
             document.getElementById('folder-input').addEventListener('change', handleImageUpload);
-            camBtn.addEventListener('click', () => { initMediaPipe(); });
+            camBtn.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                initMediaPipe();
+            });
             window.addEventListener('keydown', (e) => {
                 const key = e.key.toLowerCase();
                 if (key === 'h') {
