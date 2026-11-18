@@ -1059,14 +1059,16 @@
                     ((cellX + Math.random()) / HEART_DENSITY_WIDTH) * 2 - 1;
                 const normalizedY =
                     1 - ((cellY + Math.random()) / HEART_DENSITY_HEIGHT) * 2;
-                const thickness = 2.35 + localDensity * 1.95;
-                const depth = Math.random() * 2 - 1;
+                const thickness = 4 * (0.9 + localDensity * 0.1);
+                const depthSign = Math.random() < 0.5 ? -1 : 1;
+                const depth =
+                    depthSign * Math.pow(Math.random(), 0.45);
                 const roundedLayer =
-                    0.95 +
-                    0.05 * Math.sqrt(Math.max(0, 1 - depth * depth));
+                    0.9 +
+                    0.1 * Math.sqrt(Math.max(0, 1 - depth * depth));
                 return [
-                    normalizedX * roundedLayer * 9.25,
-                    2.5 + normalizedY * roundedLayer * 7.8,
+                    normalizedX * roundedLayer * 8.3,
+                    2.7 + normalizedY * roundedLayer * 8.6,
                     depth * thickness
                 ];
             }
@@ -1633,7 +1635,7 @@
             mainGroup.rotation.x = STATE.rotation.x;
             const targetScatterMix = STATE.mode === 'TREE' ? 0 : 1;
             if (targetScatterMix === 1 && scatterMix < 0.01) {
-                STATE.rotation.y = 0.34;
+                STATE.rotation.y = 0.12;
                 STATE.rotation.x = 0.03;
             }
             scatterMix += (targetScatterMix - scatterMix) * Math.min(1, dt * 3.2);
