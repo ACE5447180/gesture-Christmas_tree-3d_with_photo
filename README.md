@@ -12,7 +12,7 @@
 
 虽然只有几百行代码，但视觉效果拉满了（特别是在大屏幕上）。
 
-![高饱和玫粉与金色粒子圣诞树](preview.png)
+![低饱和粉与浅香槟粒子圣诞树](preview.png)
 
 点击下面的链接可以直接访问：支持全平台
 https://electronicminer.github.io/gesture-Christmas_tree-3d_with_photo/christmas_tree_touch&gesture.html
@@ -22,13 +22,13 @@ https://electronicminer.github.io/gesture-Christmas_tree-3d_with_photo/christmas
 
 ## 🤔 这是啥？(Intro)
 
-这不是那种静态的网页贺卡。这是一棵由 **高饱和玫粉与金色粒子** 组成的动态圣诞树。
+这不是那种静态的网页贺卡。这是一棵由 **低饱和粉色与浅香槟粒子** 组成的动态圣诞树。
 我接入了 Google 的 MediaPipe，所以它能看懂你的手势。
 
-* **粒子特效**：`#E84D91`、`#F08AB8`、`#C63C76` 玫粉粒子与金色点缀构成分层树冠，树会呼吸、旋转，还能炸裂成满天星。
+* **粒子特效**：`#D2B9BE`、`#C8AAAF`、`#DAC8CD` 低饱和粉色粒子构成分层树冠，树会呼吸、旋转，还能炸裂成满天星。
 * **隔空控物**：不需要鼠标，对着摄像头挥挥手就能控制它（感觉像奇异博士）。
 * **挂载回忆**：点右上角的按钮上传照片，它们会变成带金框的拍立得，飘在树周围。
-* **玫粉审美**：深色夜空搭配高饱和玫粉与金色，形成鲜明、华丽的圣诞氛围。
+* **低饱和审美**：深色夜空搭配低饱和粉与浅香槟色，保留精致、柔和的圣诞氛围。
 * **背景音乐**：页面包含《All I Want for Christmas Is You》，首次轻触页面或音乐按钮后播放。
 <img width="2557" height="1291" alt="image" src="https://github.com/user-attachments/assets/d7d31b4c-bf4d-49b2-b922-79813bbddba5" />
 
