@@ -1059,17 +1059,15 @@
                     ((cellX + Math.random()) / HEART_DENSITY_WIDTH) * 2 - 1;
                 const normalizedY =
                     1 - ((cellY + Math.random()) / HEART_DENSITY_HEIGHT) * 2;
+                const thickness = 2.35 + localDensity * 1.95;
                 const depth = Math.random() * 2 - 1;
-                const roundedLayer = Math.sqrt(
-                    Math.max(0.025, 1 - depth * depth)
-                );
-                const thickness = 4.25 * (0.9 + localDensity * 0.1);
+                const roundedLayer =
+                    0.95 +
+                    0.05 * Math.sqrt(Math.max(0, 1 - depth * depth));
                 return [
-                    normalizedX * roundedLayer * 9.4,
-                    2.5 + normalizedY * roundedLayer * 9,
-                    depth * thickness,
-                    normalizedX,
-                    normalizedY
+                    normalizedX * roundedLayer * 9.25,
+                    2.5 + normalizedY * roundedLayer * 7.8,
+                    depth * thickness
                 ];
             }
 
@@ -1084,25 +1082,10 @@
                     0.08,
                     1
                 );
-                const light =
-                    THREE.MathUtils.clamp(
-                        0.48 -
-                            heartPoint[3] * 0.16 +
-                            heartPoint[4] * 0.18 +
-                            depthGlow * 0.25,
-                        0,
-                        1
-                    );
-                const highlight = Math.max(
-                    0,
-                    1 -
-                        Math.hypot(heartPoint[3] + 0.32, heartPoint[4] - 0.42) /
-                            0.85
-                );
                 heartColor.setRGB(
-                    0.99,
-                    0.44 + light * 0.16 + highlight * 0.08,
-                    0.62 + light * 0.14 + highlight * 0.06,
+                    0.96,
+                    0.44 + depthGlow * 0.12,
+                    0.62 + depthGlow * 0.16,
                     THREE.SRGBColorSpace
                 );
                 heartColors.push(heartColor.r, heartColor.g, heartColor.b);
@@ -1220,7 +1203,7 @@
                     void main() {
                         float alpha = texture2D(uMap, gl_PointCoord).a;
                         if (alpha < 0.02) discard;
-                        gl_FragColor = vec4(vColor, alpha * mix(0.72, 0.2, uMix));
+                        gl_FragColor = vec4(vColor, alpha * mix(0.72, 0.28, uMix));
                         #include <tonemapping_fragment>
                         #include <colorspace_fragment>
                     }
@@ -1669,12 +1652,12 @@
             if (bloomPassEffect) {
                 bloomPassEffect.strength = THREE.MathUtils.lerp(
                     0.58,
-                    0.09,
+                    0.15,
                     scatterMix
                 );
                 bloomPassEffect.radius = THREE.MathUtils.lerp(
                     0.48,
-                    0.28,
+                    0.32,
                     scatterMix
                 );
             }
