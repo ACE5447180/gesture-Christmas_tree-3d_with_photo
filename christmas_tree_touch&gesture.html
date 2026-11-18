@@ -609,7 +609,7 @@
             touch: { active: false, startX: 0, startY: 0, lastX: 0, lastY: 0 }
         };
 
-        let scene, camera, renderer, composer;
+        let scene, camera, renderer, composer, bloomPassEffect;
         let mainGroup;
         let clock = new THREE.Clock();
         let particleSystem = [];
@@ -783,11 +783,11 @@
 
         function setupPostProcessing() {
             const renderScene = new RenderPass(scene, camera);
-            const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.4, 0.62, 0.84);
-            bloomPass.threshold = 0.58; bloomPass.strength = 0.58; bloomPass.radius = 0.48;
+            bloomPassEffect = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.4, 0.62, 0.84);
+            bloomPassEffect.threshold = 0.58; bloomPassEffect.strength = 0.58; bloomPassEffect.radius = 0.48;
             composer = new EffectComposer(renderer);
             composer.addPass(renderScene);
-            composer.addPass(bloomPass);
+            composer.addPass(bloomPassEffect);
         }
 
         function createTextures() {
@@ -1020,35 +1020,58 @@
             const sourceCenterY = 6.1;
 
             function sampleHeartVolume() {
-                let hx;
-                let hy;
-                let inside;
-                do {
-                    hx = Math.random() * 2.2 - 1.1;
-                    hy = Math.random() * 2.08 - 1.04;
+                const theta = Math.random() * Math.PI * 2;
+                const directionX = Math.cos(theta);
+                const directionY = Math.sin(theta);
+
+                function insideHeart(x, y) {
                     const leftLobe =
-                        Math.pow((hx + 0.38) / 0.63, 2) +
-                            Math.pow((hy - 0.30) / 0.60, 2) <=
+                        Math.pow((x + 0.38) / 0.63, 2) +
+                            Math.pow((y - 0.3) / 0.6, 2) <=
                         1;
                     const rightLobe =
-                        Math.pow((hx - 0.38) / 0.63, 2) +
-                            Math.pow((hy - 0.30) / 0.60, 2) <=
+                        Math.pow((x - 0.38) / 0.63, 2) +
+                            Math.pow((y - 0.3) / 0.6, 2) <=
                         1;
-                    const bodyProgress = (hy + 1.02) / 1.46;
+                    const bodyProgress = (y + 1.02) / 1.46;
                     const body =
                         bodyProgress >= 0 &&
                         bodyProgress <= 1 &&
-                        Math.abs(hx) <=
+                        Math.abs(x) <=
                             Math.pow(Math.max(0, bodyProgress), 0.78);
-                    inside = leftLobe || rightLobe || body;
-                } while (!inside);
+                    return leftLobe || rightLobe || body;
+                }
 
+                let low = 0;
+                let high = 1.5;
+                for (let step = 0; step < 18; step += 1) {
+                    const middle = (low + high) * 0.5;
+                    if (
+                        insideHeart(
+                            directionX * middle,
+                            directionY * middle
+                        )
+                    ) {
+                        low = middle;
+                    } else {
+                        high = middle;
+                    }
+                }
+
+                const roll = Math.random();
+                let radialScale;
+                if (roll < 0.015) {
+                    radialScale = Math.sqrt(Math.random()) * 0.52;
+                } else if (roll < 0.06) {
+                    radialScale = 1.02 + Math.random() * 0.08;
+                } else {
+                    radialScale = 0.82 + Math.random() * 0.16;
+                }
                 const depth = Math.random() * 2 - 1;
-                const layerScale = Math.sqrt(Math.max(0.02, 1 - depth * depth));
                 return [
-                    hx * layerScale * 8.9,
-                    2.7 + hy * layerScale * 8.7,
-                    depth * 4.2
+                    directionX * low * radialScale * 8.6,
+                    2.7 + directionY * low * radialScale * 8.5,
+                    depth * 1.7
                 ];
             }
 
@@ -1184,7 +1207,7 @@
                     void main() {
                         float alpha = texture2D(uMap, gl_PointCoord).a;
                         if (alpha < 0.02) discard;
-                        gl_FragColor = vec4(vColor, alpha * mix(0.72, 0.32, uMix));
+                        gl_FragColor = vec4(vColor, alpha * mix(0.72, 0.28, uMix));
                         #include <tonemapping_fragment>
                         #include <colorspace_fragment>
                     }
@@ -1614,7 +1637,7 @@
             mainGroup.rotation.x = STATE.rotation.x;
             const targetScatterMix = STATE.mode === 'TREE' ? 0 : 1;
             if (targetScatterMix === 1 && scatterMix < 0.01) {
-                STATE.rotation.y = 0.45;
+                STATE.rotation.y = 0.22;
                 STATE.rotation.x = 0.03;
             }
             scatterMix += (targetScatterMix - scatterMix) * Math.min(1, dt * 3.2);
@@ -1629,6 +1652,18 @@
             }
             if (groundCloud) {
                 groundCloud.material.opacity = 0.76 * (1 - scatterMix * 0.92);
+            }
+            if (bloomPassEffect) {
+                bloomPassEffect.strength = THREE.MathUtils.lerp(
+                    0.58,
+                    0.15,
+                    scatterMix
+                );
+                bloomPassEffect.radius = THREE.MathUtils.lerp(
+                    0.48,
+                    0.32,
+                    scatterMix
+                );
             }
             particleSystem.forEach(p => p.update(dt, STATE.mode, STATE.focusTarget));
             updateSnow();
