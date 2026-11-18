@@ -1059,17 +1059,17 @@
                     ((cellX + Math.random()) / HEART_DENSITY_WIDTH) * 2 - 1;
                 const normalizedY =
                     1 - ((cellY + Math.random()) / HEART_DENSITY_HEIGHT) * 2;
-                const thickness = 4 * (0.9 + localDensity * 0.1);
-                const depthSign = Math.random() < 0.5 ? -1 : 1;
-                const depth =
-                    depthSign * Math.pow(Math.random(), 0.45);
-                const roundedLayer =
-                    0.9 +
-                    0.1 * Math.sqrt(Math.max(0, 1 - depth * depth));
+                const depth = Math.random() * 2 - 1;
+                const roundedLayer = Math.sqrt(
+                    Math.max(0.025, 1 - depth * depth)
+                );
+                const thickness = 4.25 * (0.9 + localDensity * 0.1);
                 return [
-                    normalizedX * roundedLayer * 8.3,
-                    2.7 + normalizedY * roundedLayer * 8.6,
-                    depth * thickness
+                    normalizedX * roundedLayer * 9.4,
+                    2.5 + normalizedY * roundedLayer * 9,
+                    depth * thickness,
+                    normalizedX,
+                    normalizedY
                 ];
             }
 
@@ -1084,10 +1084,25 @@
                     0.08,
                     1
                 );
+                const light =
+                    THREE.MathUtils.clamp(
+                        0.48 -
+                            heartPoint[3] * 0.16 +
+                            heartPoint[4] * 0.18 +
+                            depthGlow * 0.25,
+                        0,
+                        1
+                    );
+                const highlight = Math.max(
+                    0,
+                    1 -
+                        Math.hypot(heartPoint[3] + 0.32, heartPoint[4] - 0.42) /
+                            0.85
+                );
                 heartColor.setRGB(
-                    0.96,
-                    0.44 + depthGlow * 0.12,
-                    0.62 + depthGlow * 0.16,
+                    0.99,
+                    0.44 + light * 0.16 + highlight * 0.08,
+                    0.62 + light * 0.14 + highlight * 0.06,
                     THREE.SRGBColorSpace
                 );
                 heartColors.push(heartColor.r, heartColor.g, heartColor.b);
@@ -1205,7 +1220,7 @@
                     void main() {
                         float alpha = texture2D(uMap, gl_PointCoord).a;
                         if (alpha < 0.02) discard;
-                        gl_FragColor = vec4(vColor, alpha * mix(0.72, 0.28, uMix));
+                        gl_FragColor = vec4(vColor, alpha * mix(0.72, 0.2, uMix));
                         #include <tonemapping_fragment>
                         #include <colorspace_fragment>
                     }
@@ -1635,7 +1650,7 @@
             mainGroup.rotation.x = STATE.rotation.x;
             const targetScatterMix = STATE.mode === 'TREE' ? 0 : 1;
             if (targetScatterMix === 1 && scatterMix < 0.01) {
-                STATE.rotation.y = 0.12;
+                STATE.rotation.y = 0.34;
                 STATE.rotation.x = 0.03;
             }
             scatterMix += (targetScatterMix - scatterMix) * Math.min(1, dt * 3.2);
@@ -1654,12 +1669,12 @@
             if (bloomPassEffect) {
                 bloomPassEffect.strength = THREE.MathUtils.lerp(
                     0.58,
-                    0.15,
+                    0.09,
                     scatterMix
                 );
                 bloomPassEffect.radius = THREE.MathUtils.lerp(
                     0.48,
-                    0.32,
+                    0.28,
                     scatterMix
                 );
             }
