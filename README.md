@@ -14,6 +14,8 @@
 
 ![银白粉紫螺旋粒子树与粉色爱心](preview.png)
 
+![粒子展开后的立体粉色爱心](preview-heart.png)
+
 点击下面的链接可以直接访问：支持全平台
 https://ace5447180.github.io/gesture-Christmas_tree-3d_with_photo/christmas_tree_touch&gesture.html
 
@@ -26,6 +28,7 @@ https://ace5447180.github.io/gesture-Christmas_tree-3d_with_photo/christmas_tree
 我接入了 Google 的 MediaPipe，所以它能看懂你的手势。
 
 * **粒子特效**：数万颗银白、青蓝与浅紫粒子组成蓬松螺旋树冠，地面带有同心光环，空中飘浮蓝色星屑。
+* **心形展开**：点击底部星芒按钮、双击屏幕或使用张开手掌手势，所有树粒子会平滑汇聚成有厚度的粉色 3D 爱心。
 * **隔空控物**：不需要鼠标，对着摄像头挥挥手就能控制它（感觉像奇异博士）。
 * **挂载回忆**：点右上角的按钮上传照片，它们会变成带浅粉框的拍立得，飘在树周围。
 * **全屏呈现**：页面固定铺满手机或桌面视口，不产生滚动，并保留微信安全区适配。
