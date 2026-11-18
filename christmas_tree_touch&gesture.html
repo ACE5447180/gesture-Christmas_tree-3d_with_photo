@@ -570,6 +570,11 @@
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
         import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
+        import {
+            HEART_DENSITY_WIDTH,
+            HEART_DENSITY_HEIGHT,
+            HEART_DENSITY_ROWS
+        } from './heart-density.js';
 
         const IS_MOBILE = window.matchMedia("(max-width: 640px)").matches;
         const IS_COMPACT = window.innerHeight < 650;
@@ -1019,61 +1024,47 @@
             const treeHeight = 12;
             const sourceCenterY = 6.1;
 
+            const heartDensity = new Uint8Array(
+                HEART_DENSITY_WIDTH * HEART_DENSITY_HEIGHT
+            );
+            const heartDensityCumulative = new Uint32Array(
+                HEART_DENSITY_WIDTH * HEART_DENSITY_HEIGHT
+            );
+            let heartDensityTotal = 0;
+            let densityIndex = 0;
+            for (const row of HEART_DENSITY_ROWS) {
+                for (const value of row) {
+                    const densityValue = parseInt(value, 16);
+                    heartDensity[densityIndex] = densityValue;
+                    heartDensityTotal += densityValue;
+                    heartDensityCumulative[densityIndex] =
+                        heartDensityTotal;
+                    densityIndex += 1;
+                }
+            }
+
             function sampleHeartVolume() {
-                const theta = Math.random() * Math.PI * 2;
-                const directionX = Math.cos(theta);
-                const directionY = Math.sin(theta);
-
-                function insideHeart(x, y) {
-                    const leftLobe =
-                        Math.pow((x + 0.54) / 0.64, 2) +
-                            Math.pow((y - 0.32) / 0.62, 2) <=
-                        1;
-                    const rightLobe =
-                        Math.pow((x - 0.54) / 0.64, 2) +
-                            Math.pow((y - 0.32) / 0.62, 2) <=
-                        1;
-                    const bodyProgress = (y + 1.05) / 1.5;
-                    const body =
-                        bodyProgress >= 0 &&
-                        bodyProgress <= 1 &&
-                        Math.abs(x) <=
-                            Math.pow(Math.max(0, bodyProgress), 0.74);
-                    return leftLobe || rightLobe || body;
-                }
-
+                const target = Math.random() * heartDensityTotal;
                 let low = 0;
-                let high = 1.5;
-                for (let step = 0; step < 18; step += 1) {
-                    const middle = (low + high) * 0.5;
-                    if (
-                        insideHeart(
-                            directionX * middle,
-                            directionY * middle
-                        )
-                    ) {
-                        low = middle;
-                    } else {
-                        high = middle;
-                    }
+                let high = heartDensityCumulative.length - 1;
+                while (low < high) {
+                    const middle = (low + high) >> 1;
+                    if (heartDensityCumulative[middle] > target) high = middle;
+                    else low = middle + 1;
                 }
-
-                const roll = Math.random();
-                let radialScale;
-                if (roll < 0.015) {
-                    radialScale = Math.sqrt(Math.random()) * 0.52;
-                } else if (roll < 0.06) {
-                    radialScale = 1.02 + Math.random() * 0.08;
-                } else {
-                    radialScale = 0.82 + Math.random() * 0.16;
-                }
+                const cellX = low % HEART_DENSITY_WIDTH;
+                const cellY = Math.floor(low / HEART_DENSITY_WIDTH);
+                const normalizedX =
+                    ((cellX + Math.random()) / HEART_DENSITY_WIDTH) * 2 - 1;
+                const normalizedY =
+                    1 - ((cellY + Math.random()) / HEART_DENSITY_HEIGHT) * 2;
                 const depth = Math.random() * 2 - 1;
                 const roundedLayer =
-                    0.92 +
-                    0.08 * Math.sqrt(Math.max(0, 1 - depth * depth));
+                    0.93 +
+                    0.07 * Math.sqrt(Math.max(0, 1 - depth * depth));
                 return [
-                    directionX * low * radialScale * roundedLayer * 8.3,
-                    2.7 + directionY * low * radialScale * roundedLayer * 8.3,
+                    normalizedX * roundedLayer * 9.25,
+                    2.5 + normalizedY * roundedLayer * 7.8,
                     depth * 2.2
                 ];
             }
