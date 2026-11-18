@@ -12,6 +12,8 @@
 
 虽然只有几百行代码，但视觉效果拉满了（特别是在大屏幕上）。
 
+![粉色与金色粒子圣诞树](preview.png)
+
 点击下面的链接可以直接访问：支持全平台
 https://electronicminer.github.io/gesture-Christmas_tree-3d_with_photo/christmas_tree_touch&gesture.html
 
@@ -20,13 +22,14 @@ https://electronicminer.github.io/gesture-Christmas_tree-3d_with_photo/christmas
 
 ## 🤔 这是啥？(Intro)
 
-这不是那种静态的网页贺卡。这是一棵由 **几千个粒子** 组成的动态树。
+这不是那种静态的网页贺卡。这是一棵由 **粉色与金色粒子** 组成的动态圣诞树。
 我接入了 Google 的 MediaPipe，所以它能看懂你的手势。
 
-* **粒子特效**：树会呼吸、旋转，还能炸裂成满天星。
+* **粒子特效**：粉、玫瑰金与香槟金粒子构成分层树冠，树会呼吸、旋转，还能炸裂成满天星。
 * **隔空控物**：不需要鼠标，对着摄像头挥挥手就能控制它（感觉像奇异博士）。
 * **挂载回忆**：点右上角的按钮上传照片，它们会变成带金框的拍立得，飘在树周围。
-* **极简审美**：只有黑金配色，没有花里胡哨的装饰，主打一个“高级感”。
+* **粉金审美**：深莓色夜空搭配粉色、玫瑰金与香槟金，保留精致的圣诞氛围。
+* **背景音乐**：页面包含《All I Want for Christmas Is You》，首次轻触页面或音乐按钮后播放。
 <img width="2557" height="1291" alt="image" src="https://github.com/user-attachments/assets/d7d31b4c-bf4d-49b2-b922-79813bbddba5" />
 
 <img width="2559" height="1294" alt="image" src="https://github.com/user-attachments/assets/d7e4e982-3042-449d-8898-105048aeac1d" />
@@ -41,7 +44,7 @@ https://electronicminer.github.io/gesture-Christmas_tree-3d_with_photo/christmas
 
 ## 🎮 怎么玩？(Controls)
 
-第一次玩建议把音响打开（虽然还没加背景音乐，但你可以自己放首 Jingle Bells 🎵）。
+第一次玩建议把音响打开，轻触页面或左上角的音乐按钮即可播放圣诞背景音乐。
 
 ### 🖐️ 手势模式 (重点！)
 确保浏览器允许使用摄像头，然后：
